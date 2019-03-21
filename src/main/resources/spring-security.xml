@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+    <bean id="sessionAuthenticationStrategy" class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+         <constructor-arg>
+            <list>
+                 <bean class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
+                    <constructor-arg ref="sessionRegistry" />
+                 </bean>
+                 <bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy"></bean>
+                 <bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
+                     <constructor-arg ref="sessionRegistry" />
+                 </bean>
+            </list>
+         </constructor-arg>
+    </bean>
+    <sec:http pattern="/" security="none"/>
+    <sec:http auto-config="true" authentication-manager-ref="authentication-manager">
+        <sec:intercept-url pattern="/**" access="isAuthenticated()"/>
+        <sec:form-login 
+           login-page="/"
+        		login-processing-url="/login"
+         		default-target-url="/admin/user!list.action"
+         		authentication-failure-url="/"
+         		username-parameter="username"
+         		password-parameter="password"
+        />
+        <sec:headers disabled="true"/>
+        <sec:csrf disabled="true"/>
+        <sec:logout logout-url="/logout" logout-success-url="/"/>
+        <sec:session-management invalid-session-url="/" session-authentication-strategy-ref="sessionAuthenticationStrategy"/>
+    </sec:http>
+    <bean id="securityUserDetailsService" class="com.xxx.ssh.web.service.impl.SecurityUserDetailsService">
+    </bean>
+    <sec:authentication-manager id="authentication-manager">
+        <sec:authentication-provider user-service-ref="securityUserDetailsService">
+           <sec:password-encoder hash="md5"/>
+        </sec:authentication-provider>
+    </sec:authentication-manager>
+</beans>

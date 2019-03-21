@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+     </bean>
+     <bean id="myEntityInterceptor" class="com.xxx.ssh.web.config.MyEntityInterceptor"/>
+     <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="entityInterceptor" ref="myEntityInterceptor"></property>
+        <property name="hibernateProperties">
+             <value>
+                 hibernate.dialect=${hibernate.dialect}
+                 hibernate.show_sql=${hibernate.show_sql}
+                 hibernate.format_sql=${hibernate.format_sql}
+                 hibernate.hbm2ddl.auto=${hibernate.hbm2ddl.auto}
+                 hibernate.cache.use_second_level_cache=false
+                 hibernate.cache.use_query_cache=false
+                 hibernate.jdbc.fetch_size=50
+                 hibernate.jdbc.batch_size=50
+                 hibernate.connection.release_mode=auto
+      			 hibernate.connection.autocommit=true
+      			 hibernate.current_session_context_class=org.springframework.orm.hibernate5.SpringSessionContext
+             </value>
+        </property>
+        <property name="packagesToScan" value="com.xxx.ssh.web.domain"></property>
+     </bean>
+     <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+         <property name="sessionFactory" ref="sessionFactory"></property>
+     </bean>
+     <tx:advice id="txAdvice" transaction-manager="transactionManager">
+         <tx:attributes>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="save*" propagation="REQUIRED"/>   
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>    
+            <tx:method name="transfer*" propagation="REQUIRED"/>
+         </tx:attributes>
+     </tx:advice>
+     
+     <aop:config>
+         <aop:pointcut expression="execution( * com.xxx.ssh.web.service.*.*(..))" id="tx-pointcut"/>
+         <aop:advisor advice-ref="txAdvice" pointcut-ref="tx-pointcut"/>
+     </aop:config>
+</beans>
