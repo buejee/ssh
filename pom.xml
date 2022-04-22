@@ -10,7 +10,7 @@
   <properties>
       <maven.compiler.source>1.8</maven.compiler.source>
       <maven.compiler.target>1.8</maven.compiler.target>
-      <struts2.version>2.5.16</struts2.version>
+      <struts2.version>2.5.30</struts2.version>
       <spring.version>4.3.13.RELEASE</spring.version>
       <slf4j.version>1.7.25</slf4j.version>
       <hibernate.version>5.2.17.Final</hibernate.version>
