@@ -13,7 +13,7 @@
       <struts2.version>2.5.16</struts2.version>
       <spring.version>4.3.13.RELEASE</spring.version>
       <slf4j.version>1.7.25</slf4j.version>
-      <hibernate.version>5.2.17.Final</hibernate.version>
+      <hibernate.version>5.3.20.Final</hibernate.version>
       <jackson.version>2.9.10</jackson.version>
   </properties>
   <dependencies>
